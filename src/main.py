@@ -11,14 +11,16 @@ class RunCat:
     def __init__(self):
         self.current_dir = os.path.dirname(os.path.abspath(__file__)) 
         self.timeout_interval = 100
+        self.frame = 0
+
         self.indicator = appindicator.Indicator.new(
             "RunCat",
             self.current_dir + "/0.png",
             appindicator.IndicatorCategory.APPLICATION_STATUS)
-
-
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
-        #timeout = GLib.timeout_add(int(self.timeout_interval), self.timeout_callback)
+
+        self.timeout = GLib.timeout_add(int(self.timeout_interval), self.timeout_callback)
+
         self.init_menus()
 
     def init_menus(self):
@@ -31,6 +33,16 @@ class RunCat:
         item.connect("activate",func , name)
         self.menu.append(item)
         item.show()
+
+    def timeout_callback(self):
+        img_name = str(self.frame) + ".png"
+        self.indicator.set_icon(self.current_dir +"/"+ img_name)
+        self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
+
+        self.frame += 1
+        if self.frame > 4:
+            self.frame = 0
+        return True
 
 
 if __name__ == "__main__":
